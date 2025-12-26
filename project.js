@@ -10,7 +10,9 @@
   const PROJECTS = [
     { name: "Portfolio-881236", title: "Personal Portfolio" },
     { name: "Key-of-Success", title: "Key of Success" },
-    { name: "Quizzone", title: "Quizzone - Learning Platform" }
+    { name: "Quizzone", title: "Quizzone - Learning Platform" },
+    { name: "LocalRepo", title: "My Profile Dashboard" },
+    { name: "sitemapjs", title: "Akshat Projects Hub" }
   ];
 
   const BASE_PREFIX = "https://akshat-881236.github.io/";
