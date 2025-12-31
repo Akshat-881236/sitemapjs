@@ -10,9 +10,10 @@
   const PROJECTS = [
     { name: "Portfolio-881236", title: "Personal Portfolio" },
     { name: "Key-of-Success", title: "Key of Success" },
-    { name: "Quizzone", title: "Quizzone - Learning Platform" },
+    { name: "SitemapGeneratorXml", title: "Sitemap Generator XML" },
     { name: "LocalRepo", title: "My Profile Dashboard" },
-    { name: "sitemapjs", title: "Akshat Projects Hub" }
+    { name: "sitemapjs", title: "Akshat Projects Hub" },
+    { name: "TrackerJS", title: "TrackerJS" }
   ];
 
   const BASE_PREFIX = "https://akshat-881236.github.io/";
@@ -44,7 +45,7 @@
         </ul>
       </section>
       <footer>
-© Akshat Prasad · SitemapJS Authority Hub
+© Akshat Prasad · Akshat Projects Hub
 </footer>
     `;
 
