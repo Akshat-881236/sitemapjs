@@ -1,6 +1,8 @@
 /* =========================================================
    AKSHAT NETWORK – SMART NAV + BREADCRUMB + PROMO CARDS
-   Single JS | innerHTML + CSS | Non-intrusive
+   Updated: show promo card only for projects that are linked
+   on the current page (i.e. the page contains anchors to
+   one or more Akshat project URLs). Non-intrusive fallback.
    ========================================================= */
 (function () {
   "use strict";
@@ -177,38 +179,77 @@
     }
   });
 
-  /* ---------- PROMO CARD SEQUENCE ---------- */
+  /* ---------- FIND PROJECTS LINKED FROM THE PAGE ----------
+     New behavior:
+     - Scan the page for anchors that link to any PROJECTS url.
+     - If found, use that filtered list (projectsLinked) as the
+       promo sequence. This ensures the nav card appears only
+       for projects that are actually linked from the page.
+     - If none are found, do nothing (no promo cards). This
+       keeps the script non-intrusive.
+  */
+  const anchors = Array.from(document.querySelectorAll("a[href]"));
+  const projectsLinked = PROJECTS.filter(p => {
+    // don't suggest the project if user is already on its page
+    if (location.href.startsWith(p.url)) return false;
+    return anchors.some(a => {
+      try {
+        // normalize and compare absolute hrefs and path matches
+        const ah = a.href;
+        if (!ah) return false;
+        if (ah === p.url) return true;
+        if (ah.startsWith(p.url)) return true;
+        // match by pathname portion (covers relative links)
+        const pjPath = new URL(p.url).pathname.replace(/\/+$/,"");
+        return ah.indexOf(pjPath) !== -1;
+      } catch (e) {
+        // fallback simple string match
+        return a.getAttribute("href") && a.getAttribute("href").indexOf(p.url) !== -1;
+      }
+    });
+  });
+
+  // If there are no linked projects on this page, stop (non-intrusive)
+  if (!projectsLinked.length) return;
+
+  /* ---------- PROMO CARD SEQUENCE (for linked projects only) ---------- */
   let index = 0;
+  const SEQUENCE = projectsLinked; // show only projects that are linked on the page
 
   function showCard(project){
     const card = document.createElement("div");
     card.className="akshat-card";
     card.innerHTML=`
-      <span class="akshat-close">✕</span>
+      <span class="akshat-close" title="Close">✕</span>
       <img src="https://akshat-881236.github.io/TrackerJS/Assets/AKNH/icon-96.png" alt="Akshat Logo" style="width:40px;height:40px;float:right;margin-left:10px;border-radius:8px;" class="akshat-logo"/>
       <h1 style="margin-top:0;">Akshat Network Hub</h1>
-      <p>We noticed you're exploring. Here’s a project you might find interesting:</p>
+      <p>We noticed a link to an Akshat project on this page. You might find it interesting:</p>
       <h4>${project.title}</h4>
       <p>${project.desc}</p>
       <div class="akshat-actions">
-        <a href="${project.url}" target="_blank">Visit</a>
-        <button>Later</button>
+        <a href="${project.url}" target="_blank" rel="noopener">Visit</a>
+        <button type="button">Later</button>
       </div>
     `;
 
-    card.querySelector(".akshat-close").onclick =
-    card.querySelector("button").onclick = ()=>{
+    const closeEl = card.querySelector(".akshat-close");
+    const laterBtn = card.querySelector("button");
+
+    function closeAndNext() {
       card.remove();
       index++;
       scheduleNext();
-    };
+    }
+
+    closeEl.onclick = closeAndNext;
+    laterBtn.onclick = closeAndNext;
 
     document.body.appendChild(card);
   }
 
   function scheduleNext(){
-    if(index < PROJECTS.length){
-      setTimeout(()=>showCard(PROJECTS[index]), 90000); // 1.5 min
+    if(index < SEQUENCE.length){
+      setTimeout(()=>showCard(SEQUENCE[index]), 90000); // 1.5 min between cards
     } else {
       askDisable();
     }
@@ -218,10 +259,10 @@
     const card = document.createElement("div");
     card.className="akshat-card";
     card.innerHTML=`
-      <span class="akshat-close">✕</span>
+      <span class="akshat-close" title="Close">✕</span>
       <img src="https://akshat-881236.github.io/TrackerJS/Assets/AKNH/icon-96.png" alt="Akshat Logo" style="width:40px;height:40px;float:right;margin-left:10px;border-radius:8px;" class="akshat-logo"/>
       <h1 style="margin-top:0;">Akshat Network Hub</h1>
-      <p>We hope you found our project suggestions useful!</p>
+      <p>We hope you found these suggestions useful!</p>
       <h4>Auto Visit Suggestions</h4>
       <p>Do you want to turn off navigation suggestions for some time?</p>
       <div class="akshat-actions">
@@ -237,6 +278,7 @@
       disableFor(86400000);
       card.remove();
     };
+    card.querySelector(".akshat-close").onclick = ()=>card.remove();
     document.body.appendChild(card);
   }
 
@@ -246,7 +288,7 @@
     }));
   }
 
-  /* ---------- START ---------- */
-  setTimeout(()=>showCard(PROJECTS[index]),120000); // first after 2 min
+  /* ---------- START (show first linked project after 2 min) ---------- */
+  setTimeout(()=>showCard(SEQUENCE[index]),120000); // first after 2 min
 
 })();
