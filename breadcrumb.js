@@ -22,7 +22,7 @@
   const STORE_KEY = "akshat_auto_nav_pref"; // user disable prefs
   const DB_KEY = "AKSHAT_DB_v1"; // internal small DB for messages/quotes
   const SESSION_IGNORE_KEY = "akshat_ignore_session"; // session flag
-  const TIMINGS = [30000, 150000, 240000, 240000, 240000, 30000, 50000]; // 30s, 2.5min, 4min, then every 4min
+  const TIMINGS = [900, 1500, 6000, 12000, 8000, 3000, 5000]; // 30s, 2.5min, 4min, then every 4min
 
   /* ---------- UTIL: storage pref check ---------- */
   const pref = JSON.parse(localStorage.getItem(STORE_KEY) || "{}");
